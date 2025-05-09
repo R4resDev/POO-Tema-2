@@ -1,70 +1,309 @@
 # POO-Tema-2
 
-### **Descrierea Proiectului: Jocul Single n-Back**  
+# **Analiză detaliată a programului Single N-Back**
 
-#### **Enunț**  
-Single n-Back este un joc de antrenament cognitiv care testează memoria de lucru și abilitățile de concentrare. Jocul prezintă o succesiune de stimuli vizuali (pătrate negre pe o grilă 3x3), iar jucătorul trebuie să determine dacă stimulul curent este identic cu cel de la `n` pași în urmă.  
-
-#### **Cerințe**  
-1. **Implementarea Ierarhiei de Excepții**  
-   - Clase de excepții pentru: nivel invalid, input invalid și sfârșitul jocului.  
-   - Moștenire din `std::exception`.  
-
-2. **Clasa `Stimulus` și Derivata `VisualStimulus`**  
-   - `Stimulus`: clasă abstractă cu metode virtuale pure (`display`, `matches`, `clone`).  
-   - `VisualStimulus`: implementează un stimul vizual (poziție pe grilă).  
-
-3. **Clasa `SingleNBackGame`**  
-   - Gestionează logica jocului:  
-     - Generare secvență aleatoare de stimuli.  
-     - Afișare pe grid 3x3.  
-     - Validare răspunsuri (1 = match, 0 = nu match).  
-     - Calcul scor și streak-uri.  
-
-4. **Interfață Utilizator Simplă**  
-   - Afișare grid cu pătrate (⬛ = stimul curent, ⬜ = gol).  
-   - Timp limitat de răspuns (5 secunde).  
-   - Feedback imediat (corect/gresit + scor).  
-
-5. **Funcționalități Adiționale**  
-   - Clear screen între runde.  
-   - Sistem de dificultate (nivel `n` între 1-5).  
-   - Best streak și scor final.  
+Acest program implementează jocul **"Single N-Back"**, un exercițiu cognitiv care testează memoria de lucru.
 
 ---
 
-### **Bibliografie / Surse de Inspirație**  
-1. **n-Back Task**  
-   - Jaeggi, S. M., et al. (2008). *"Improving fluid intelligence with training on working memory."* PNAS.  
-   - [https://en.wikipedia.org/wiki/N-back](https://en.wikipedia.org/wiki/N-back)  
+## **1. Structura proiectului**
+Programul este împărțit în mai multe fișiere:
 
-2. **Implementări Existente**  
-   - Dual N-Back (joc open-source): [https://github.com/petrkle/dual-n-back](https://github.com/petrkle/dual-n-back)  
-   - Brain Workshop (Python): [http://brainworkshop.sourceforge.net/](http://brainworkshop.sourceforge.net/)  
-
-3. **C++ Resources**  
-   - Random Number Generation: [https://en.cppreference.com/w/cpp/numeric/random](https://en.cppreference.com/w/cpp/numeric/random)  
-   - Smart Pointers: [https://en.cppreference.com/w/cpp/memory/shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr)  
+- **`main.cpp`** – Punctul de intrare în program, gestionează meniul principal.
+- **`game.h` / `game.cpp`** – Clasa `SingleNBackGame`, care implementează logica jocului.
+- **`stimulus.h` / `stimulus.cpp`** – Clasele pentru stimuli (vizuali, colorați, numerici).
+- **`exceptions.h` / `exceptions.cpp`** – Sistemul de excepții.
+- **`utils.h` / `utils.cpp`** – Funcții utilitare (afișare grid, clear screen, etc.).
 
 ---
 
-### **Exemplu de Interacțiune**  
+## **2. Fluxul programului (ordinea de execuție)**
+### **A. Inițializare (`main.cpp`)**
+1. **Se afișează meniul principal (`displayMenu()`)**:
+   - Utilizatorul alege între:
+     - `1` (Joc normal - pătrate negre)
+     - `2` (Joc color - emoji)
+     - `3` (Joc numeric - cifre)
+     - `4` (Ieșire)
+2. **Se validează input-ul (`InvalidGameTypeException` dacă e invalid)**.
+3. **Se apelează `playGame(int gameType)`**.
+
+### **B. Configurare joc (`utils.cpp` → `playGame()`)**
+1. **Se cere nivelul (1-5)**:
+   - `N` determină câți pași înapoi trebuie să-și amintească jucătorul.
+   - Dacă nivelul e invalid, se aruncă `InvalidLevelException`.
+2. **Se cere numărul de runde**.
+3. **Se creează un obiect `SingleNBackGame`** cu parametrii:
+   - `level` (N)
+   - `rounds` (număr de runde)
+   - `gameType` (normal/color/number)
+
+### **C. Execuția jocului (`game.cpp` → `SingleNBackGame::play()`)**
+1. **Se generează un șir de stimuli (`generateSequence()`)**:
+   - Se folosesc clasele derivate din `Stimulus`:
+     - `VisualStimulus` (pătrat negru)
+     - `ColorStimulus` (🔴, 🟢, 🔵, 🟡)
+     - `NumberStimulus` (cifre 0-9)
+   - Lungimea secvenței = `rounds + level` (pentru a avea suficiente elemente pentru comparație).
+2. **Se afișează gridul 3×3**:
+   - La fiecare pas, un stimul este afișat pe poziția aleatoare.
+3. **Jucătorul trebuie să răspundă dacă stimulul curent este identic cu cel de acum `N` pași**:
+   - `1` = DA, `0` = NU.
+   - Se verifică răspunsul în **5 secunde** (altfel, se consideră greșit).
+   - Se actualizează scorul (`score++` dacă corect).
+4. **La final, se aruncă `GameOverException` cu scorul final**.
+
+### **D. Meniul post-joc (`utils.cpp` → `displayAfterGameMenu()`)**
+- **Opțiuni**:
+  - `1` = Joacă din nou același mod.
+  - `2` = Întoarcere la meniul principal.
+- Dacă alegerea e invalidă, se aruncă `InvalidChoiceException`.
+
+---
+
+## **3. Detalii despre clase și moșteniri**
+### **🔹 Ierarhia de excepții (`exceptions.h`)**
+```cpp
+std::exception
+└── GameException (abstractă)
+    ├── InvalidLevelException
+    ├── InvalidInputException
+    ├── InvalidGameTypeException
+    ├── InvalidChoiceException
+    └── GameOverException (cu scor)
 ```
-Bine ai venit la Single n-Back!  
-Introdu nivelul (1-5): 2  
-Introdu numarul de runde: 10  
+- **`GameOverException`** este singura care transportă date suplimentare (`score`).
 
-Pregatire...  
-⬜⬜⬜  
-⬜⬜⬜  
-⬜⬜⬜  
+### **🔹 Sistemul de stimuli (`stimulus.h`)**
+```cpp
+Stimulus (abstract)
+├── VisualStimulus (pătrat negru)
+├── ColorStimulus (emoji colorat)
+└── NumberStimulus (cifră)
+```
+- Fiecare stimul are:
+  - `position` (1-9, poziția pe grid)
+  - Metode virtuale:
+    - `display()` (afișează pe grid)
+    - `matches()` (compară cu alt stimul)
+    - `clone()` (pentru copiere)
+  - `generateRandom()` (generează stimul aleator)
 
-Tasteaza 1 daca patratul negru este in aceeasi pozitie ca acum 2 pasi, altfel 0.  
+### **🔹 Clasa principală `SingleNBackGame` (`game.h`)**
+- **Atribute**:
+  - `level` (N-back)
+  - `score`, `rounds`, `currentStreak`, `bestStreak`
+  - `gameType` (normal/color/number)
+  - `sequence` (vector de stimuli)
+  - `gameCount` (static, număr de jocuri create)
+- **Metode**:
+  - `generateSequence()` – Umple `sequence` cu stimuli aleatorii.
+  - `play()` – Rulează jocul pas cu pas.
 
-[Nivel: 2-Back | Scor: 0 | Streak: 0]  
-⬜⬛⬜  
-⬜⬜⬜  
-⬜⬜⬜  
-Introdu raspunsul (1/0): 1  
-CORECT! (+1 punct) Scor: 1 | Streak: 1  
-```  
+---
+
+## **4. Librării utilizate**
+| Librărie | Rol |
+|----------|-----|
+| `<iostream>` | I/O (consolă) |
+| `<vector>` | Stocare secvențe de stimuli |
+| `<memory>` | `shared_ptr` pentru stimuli |
+| `<chrono>` | Măsurarea timpului de răspuns |
+| `<thread>` | Pauze (`sleep_for`) |
+| `<random>` | Generare numere aleatoare |
+| `<exception>` | Sistemul de excepții |
+
+---
+
+## **5. Exemplu de rulare**
+1. **Pornire**:
+   ```
+   =================================
+          SINGLE N-BACK          
+   =================================
+   1. Joc normal (patrate negre)
+   2. Joc color (emoji colorate)
+   3. Joc numeric (cifre)
+   4. Iesire
+   =================================
+   Alege optiunea (1-4): 1
+   ```
+2. **Configurare**:
+   ```
+   Introdu nivelul (1-5): 2
+   Introdu numarul de runde: 10
+   ```
+3. **Joc**:
+   ```
+   Nivel: 2-Back | Scor: 0 | Streak: 0 (Best: 0)
+
+   ⬜ ⬜ ⬜
+   ⬜ ⬛ ⬜
+   ⬜ ⬜ ⬜
+
+   Introdu raspunsul (1/0): 1
+   ```
+4. **Final**:
+   ```
+   Joc terminat! Scor final: 7
+   ```
+
+---
+
+## **6.Îndeplinirea cerințelor în codul Single N-Back**
+
+## **1. Funcții virtuale (pure) și polimorfism**
+### **Cerințe:**
+✅ **Funcție virtuală specifică temei** (`matches()` și `display()` în `Stimulus`)  
+✅ **Apelare prin pointeri la clasa de bază** (`std::shared_ptr<Stimulus>`)  
+✅ **Pointerii sunt atribute în altă clasă** (`SingleNBackGame` are `std::vector<std::shared_ptr<Stimulus>> sequence`)  
+
+### **Implementare:**
+- **Clasa abstractă `Stimulus`**:
+  ```cpp
+  class Stimulus {
+  public:
+      virtual ~Stimulus() = default;
+      virtual void display(std::vector<std::vector<std::string>>& grid) const = 0;
+      virtual bool matches(const std::shared_ptr<Stimulus>& other) const = 0;
+      virtual std::shared_ptr<Stimulus> clone() const = 0;
+  };
+  ```
+- **Derivatele (`VisualStimulus`, `ColorStimulus`, `NumberStimulus`)** suprascriu funcțiile:
+  ```cpp
+  // Exemplu în VisualStimulus
+  bool VisualStimulus::matches(const std::shared_ptr<Stimulus>& other) const {
+      auto derived = std::dynamic_pointer_cast<VisualStimulus>(other);
+      return derived && position == derived->position;
+  }
+  ```
+- **Apelare prin pointer de bază** (în `SingleNBackGame::play()`):
+  ```cpp
+  sequence[i]->display(grid); // Apel polimorfic
+  ```
+
+---
+
+## **2. Constructori virtuali (`clone()`)**
+### **Cerințe:**
+✅ **Clone este o funcție virtuală care creează o copie**  
+✅ **Se folosește în copierea obiectelor (ex: `SingleNBackGame`)**  
+
+### **Implementare:**
+- **Metoda `clone()` în fiecare clasă derivată**:
+  ```cpp
+  std::shared_ptr<Stimulus> VisualStimulus::clone() const {
+      return std::make_shared<VisualStimulus>(*this);
+  }
+  ```
+- **Folosit în constructorul de copiere al lui `SingleNBackGame`**:
+  ```cpp
+  for (const auto& stim : other.sequence) {
+      sequence.push_back(stim->clone()); // Copiere polimorfică
+  }
+  ```
+
+---
+
+## **3. Copy-and-Swap și supraîncărcare `operator=`**
+### **Cerințe:**
+✅ **Suprascriere `operator=` și constructor de copiere**  
+✅ **Folosire `swap` pentru gestionare resurse**  
+
+### **Implementare:**
+- **Funcția `swap` pentru fiecare clasă**:
+  ```cpp
+  void swap(VisualStimulus& a, VisualStimulus& b) noexcept {
+      using std::swap;
+      swap(a.position, b.position);
+  }
+  ```
+- **`operator=` folosind copy-and-swap**:
+  ```cpp
+  VisualStimulus& operator=(VisualStimulus other) {
+      swap(*this, other);
+      return *this;
+  }
+  ```
+
+---
+
+## **4. `dynamic_cast` și smart pointers**
+### **Cerințe:**
+✅ **Downcasting cu `std::dynamic_pointer_cast`**  
+✅ **Folosire `std::shared_ptr` în loc de pointeri raw**  
+
+### **Implementare:**
+- **Verificare tip în `matches()`**:
+  ```cpp
+  auto derived = std::dynamic_pointer_cast<VisualStimulus>(other);
+  if (!derived) return false; // Nu este de același tip
+  ```
+
+---
+
+## **5. Ierarhie de excepții**
+### **Cerințe:**
+✅ **Bază pe `std::exception`**  
+✅ **Minim 3 clase de excepții specifice**  
+✅ **Folosire în constructori și `main`**  
+
+### **Implementare:**
+- **Clasa de bază `GameException`**:
+  ```cpp
+  class GameException : public std::exception {
+  public:
+      virtual const char* what() const noexcept override = 0;
+  };
+  ```
+- **Excepții derivate**:
+  ```cpp
+  class InvalidLevelException : public GameException { /* ... */ };
+  class InvalidInputException : public GameException { /* ... */ };
+  class GameOverException : public GameException { /* ... */ };
+  ```
+- **Folosire în cod**:
+  ```cpp
+  if (level < 1 || level > 5) throw InvalidLevelException();
+  ```
+
+---
+
+## **6. Funcții și atribute statice**
+### **Cerințe:**
+✅ **Atribut static (`gameCount` în `SingleNBackGame`)**  
+✅ **Funcție statică (`getGameCount()`)**  
+
+### **Implementare:**
+```cpp
+class SingleNBackGame {
+    static int gameCount; // Numără instanțele
+public:
+    static int getGameCount() { return gameCount; }
+};
+```
+
+---
+
+## **7. STL și `const`**
+### **Cerințe:**
+✅ **Folosire STL (`std::vector`, `std::shared_ptr`)**  
+✅ **Maxim `const` (ex: metode `const`, parametri `const&`)**  
+
+### **Exemple:**
+```cpp
+void display(const std::vector<std::vector<std::string>>& grid) const;
+bool matches(const std::shared_ptr<Stimulus>& other) const;
+```
+
+---
+
+## **8. Eliminare getters/setters**
+### **Cerințe:**
+✅ **Minimizare getters/setters**  
+✅ **Folosire metode de nivel înalt**  
+
+### **Exemplu:**
+- **`SingleNBackGame` nu are getter pentru `sequence`** (se folosește direct în `play()`).
+
+---
