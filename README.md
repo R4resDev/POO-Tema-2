@@ -298,12 +298,12 @@ bool matches(const std::shared_ptr<Stimulus>& other) const;
 
 ---
 
-## **8. Eliminare getters/setters**
-### **Cerințe:**
-**Minimizare getters/setters**  
-**Folosire metode de nivel înalt**  
+## **6. Bibliografie**
 
-### **Exemplu:**
-- **`SingleNBackGame` nu are getter pentru `sequence`** (se folosește direct în `play()`).
+- **Jocuri simple de memorie scrise in C++**
+  - *https://priyanshu-shubham.github.io/cppMemoryGame/*
+  - *https://github.com/Panquesito7/terminal-memory_game*
 
----
+- **Videoclip care explica cum poti sa implementezi logica unui joc de memorie in C++**
+  - *https://www.youtube.com/watch?v=2db5zlGShQg*
+
