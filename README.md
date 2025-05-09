@@ -150,7 +150,7 @@ Stimulus (abstract)
 
 ---
 
-## **6.Îndeplinirea cerințelor în codul Single N-Back**
+## **6. Îndeplinirea cerințelor**
 
 ## **1. Funcții virtuale (pure) și polimorfism**
 ### **Cerințe:**
