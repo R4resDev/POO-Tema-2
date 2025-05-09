@@ -8,16 +8,20 @@ class SingleNBackGame {
     int rounds;
     int currentStreak;
     int bestStreak;
+    GameType gameType;
     std::vector<std::shared_ptr<Stimulus>> sequence;
+    static int gameCount;
 
     void generateSequence(int length);
     
 public:
-    SingleNBackGame(int lvl, int rnds);
-    void play();
-    int getScore() const;
-    int getLevel() const;
-};
+    SingleNBackGame(int lvl, int rnds, GameType type);
+    SingleNBackGame(const SingleNBackGame& other);
+    SingleNBackGame& operator=(SingleNBackGame other);
+    ~SingleNBackGame();
 
-void clearScreen();
-void displayGrid(const std::vector<std::vector<std::string>>& grid);
+    static int getGameCount() { return gameCount; }
+    void play();
+    
+    friend void swap(SingleNBackGame& first, SingleNBackGame& second) noexcept;
+};
