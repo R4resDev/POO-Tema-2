@@ -17,9 +17,19 @@ public:
     const char* what() const noexcept override;
 };
 
+class InvalidGameTypeException : public GameException {
+public:
+    const char* what() const noexcept override;
+};
+
+class InvalidChoiceException : public GameException {
+public:
+    const char* what() const noexcept override;
+};
+
 class GameOverException : public GameException {
 public:
     const char* what() const noexcept override;
     int score;
-    explicit GameOverException(int s);
+    explicit GameOverException(int s) : score(s) {}
 };
