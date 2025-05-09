@@ -154,9 +154,9 @@ Stimulus (abstract)
 
 ## **1. Funcții virtuale (pure) și polimorfism**
 ### **Cerințe:**
-✅ **Funcție virtuală specifică temei** (`matches()` și `display()` în `Stimulus`)  
-✅ **Apelare prin pointeri la clasa de bază** (`std::shared_ptr<Stimulus>`)  
-✅ **Pointerii sunt atribute în altă clasă** (`SingleNBackGame` are `std::vector<std::shared_ptr<Stimulus>> sequence`)  
+**Funcții virtuale** (`matches()` și `display()` în `Stimulus`)  
+**Apelare prin pointeri la clasa de bază** (`std::shared_ptr<Stimulus>`)  
+**Pointerii sunt atribuiti în altă clasă** (`SingleNBackGame` are `std::vector<std::shared_ptr<Stimulus>> sequence`)  
 
 ### **Implementare:**
 - **Clasa abstractă `Stimulus`**:
@@ -186,8 +186,8 @@ Stimulus (abstract)
 
 ## **2. Constructori virtuali (`clone()`)**
 ### **Cerințe:**
-✅ **Clone este o funcție virtuală care creează o copie**  
-✅ **Se folosește în copierea obiectelor (ex: `SingleNBackGame`)**  
+**Clone este o funcție virtuală care creează o copie**  
+**Se folosește în copierea obiectelor (ex: `SingleNBackGame`)**  
 
 ### **Implementare:**
 - **Metoda `clone()` în fiecare clasă derivată**:
@@ -207,8 +207,8 @@ Stimulus (abstract)
 
 ## **3. Copy-and-Swap și supraîncărcare `operator=`**
 ### **Cerințe:**
-✅ **Suprascriere `operator=` și constructor de copiere**  
-✅ **Folosire `swap` pentru gestionare resurse**  
+**Suprascriere `operator=` și constructor de copiere**  
+**Folosire `swap` pentru gestionare resurse**  
 
 ### **Implementare:**
 - **Funcția `swap` pentru fiecare clasă**:
@@ -230,8 +230,8 @@ Stimulus (abstract)
 
 ## **4. `dynamic_cast` și smart pointers**
 ### **Cerințe:**
-✅ **Downcasting cu `std::dynamic_pointer_cast`**  
-✅ **Folosire `std::shared_ptr` în loc de pointeri raw**  
+**Downcasting cu `std::dynamic_pointer_cast`**  
+**Folosire `std::shared_ptr` în loc de pointeri raw**  
 
 ### **Implementare:**
 - **Verificare tip în `matches()`**:
@@ -244,9 +244,9 @@ Stimulus (abstract)
 
 ## **5. Ierarhie de excepții**
 ### **Cerințe:**
-✅ **Bază pe `std::exception`**  
-✅ **Minim 3 clase de excepții specifice**  
-✅ **Folosire în constructori și `main`**  
+**Bază pe `std::exception`**  
+**Minim 3 clase de excepții specifice**  
+**Folosire în constructori și `main`**  
 
 ### **Implementare:**
 - **Clasa de bază `GameException`**:
@@ -271,8 +271,8 @@ Stimulus (abstract)
 
 ## **6. Funcții și atribute statice**
 ### **Cerințe:**
-✅ **Atribut static (`gameCount` în `SingleNBackGame`)**  
-✅ **Funcție statică (`getGameCount()`)**  
+**Atribut static (`gameCount` în `SingleNBackGame`)**  
+**Funcție statică (`getGameCount()`)**  
 
 ### **Implementare:**
 ```cpp
@@ -287,8 +287,8 @@ public:
 
 ## **7. STL și `const`**
 ### **Cerințe:**
-✅ **Folosire STL (`std::vector`, `std::shared_ptr`)**  
-✅ **Maxim `const` (ex: metode `const`, parametri `const&`)**  
+**Folosire STL (`std::vector`, `std::shared_ptr`)**  
+**Maxim `const` (ex: metode `const`, parametri `const&`)**  
 
 ### **Exemple:**
 ```cpp
@@ -300,8 +300,8 @@ bool matches(const std::shared_ptr<Stimulus>& other) const;
 
 ## **8. Eliminare getters/setters**
 ### **Cerințe:**
-✅ **Minimizare getters/setters**  
-✅ **Folosire metode de nivel înalt**  
+**Minimizare getters/setters**  
+**Folosire metode de nivel înalt**  
 
 ### **Exemplu:**
 - **`SingleNBackGame` nu are getter pentru `sequence`** (se folosește direct în `play()`).
