@@ -1,39 +1,51 @@
 #include "game.h"
-#include "game_exceptions.h"
+#include "exceptions.h"
+#include "utils.h"
 #include <iostream>
+#include <limits>
 
 int main() {
-    try {
-        int level, rounds;
+    while (true) {
+        try {
+            displayMenu();
+            int choice;
+            std::cin >> choice;
 
-        std::cout << "Bine ai venit la Single n-Back!\n";
-        std::cout << "Introdu nivelul (1-5): ";
-        std::cin >> level;
-
-        if (level < 1 || level > 5) {
-            throw InvalidLevelException();
+            if (choice == 4) {
+                break;
+            }
+            else if (choice >= 1 && choice <= 3) {
+                playGame(choice);
+            }
+            else {
+                throw InvalidGameTypeException();
+            }
         }
-
-        std::cout << "Introdu numarul de runde: ";
-        std::cin >> rounds;
-
-        SingleNBackGame game(level, rounds);
-        game.play();
-    }
-    catch (const InvalidLevelException& e) {
-        std::cerr << "Eroare: " << e.what() << std::endl;
-        return 1;
-    }
-    catch (const InvalidInputException& e) {
-        std::cerr << "Eroare: " << e.what() << std::endl;
-        return 1;
-    }
-    catch (const GameOverException& e) {
-        std::cout << e.what() << e.score << std::endl;
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Eroare neasteptata: " << e.what() << std::endl;
-        return 1;
+        catch (const InvalidLevelException& e) {
+            std::cerr << "Eroare: " << e.what() << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        catch (const InvalidInputException& e) {
+            std::cerr << "Eroare: " << e.what() << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        catch (const InvalidGameTypeException& e) {
+            std::cerr << "Eroare: " << e.what() << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        catch (const InvalidChoiceException& e) {
+            std::cerr << "Eroare: " << e.what() << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Eroare neasteptata: " << e.what() << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
     }
 
     return 0;
